@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.jsx",
   "scripts": {
-    "react-dev": "webpack -d --watch",
-    "start": "nodemon server/index.js",
-    "seed": "node db/seed.js"
+    "build": "webpack",
+    "test": "test",
+    "dev": "concurrently \"webpack -w\" \"nodemon server\"",
+    "start": "node server",
+    "seed": "cd db && node seed.js"
   },
   "author": "",
   "license": "ISC",
