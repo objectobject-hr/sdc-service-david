@@ -11,7 +11,7 @@ genReview = async () => {
   let listReviews = [];
   let ownerProb = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   let locationProb = [1, 2, 3];
-  for (let j = 0; j < 100; j++) {
+  for (let j = 0; j < 100000; j++) {
     let randRev = Math.floor(Math.random() * 25);
 
     for (let i = 0; i < randRev; i++) {
@@ -43,7 +43,7 @@ genReview = async () => {
       listReviews.push(revObj);
     }
   }
-  listReviews.forEach((review, index) =>
+  await listReviews.forEach(async (review, index) => {
     await pgClient
       .query(
         `INSERT INTO reviews (rating, dateS, title, review, dateP, author, aLocation, ownerR, ListingId) VALUES ('${review.rating}', '${review.dateS}', '${review.title}', '${review.review}', '${review.dateP}', '${review.author}', '${review.aLocation}', '${review.ownerR}', '${review.ListingId}');`
@@ -53,33 +53,31 @@ genReview = async () => {
       })
       .catch(e => {
         console.error("seeding function failed: ", e);
-      })
-  );
+      });
+  });
 };
 
 genLocations = async () => {
   let zipCodeObj;
   let zipArray = [];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 100000; i++) {
     zipCodeObj = {};
     let randZip = zipcodes.random();
     zipCodeObj.zipCode = randZip.zip;
     zipCodeObj.ListingId = i;
     zipArray.push(zipCodeObj);
   }
-  zipArray.forEach(zip =>
+  await zipArray.forEach(async zip => {
     await pgClient
       .query(
         `INSERT INTO zips (zipcode, ListingId) VALUES ('${zip.zipCode}', '${zip.ListingId}');`
       )
-      .then(() => {
-
-      })
+      .then(() => {})
       .catch(e => {
         console.error("Error: ");
-      })
-  );
+      });
+  });
 };
 genLocations();
 genReview();
