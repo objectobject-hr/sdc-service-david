@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const Reviews = require("../db/data").Reviews;
-const Zips = require("../db/data").Zips;
+const Reviews = require("../db/postgresDB/").Reviews;
+const Zips = require("../db/postgresDB/").Zips;
 const path = require("path");
 
 const app = express();
