@@ -74,7 +74,7 @@ genLocations = async () => {
         `INSERT INTO zips (zipcode, ListingId) VALUES ('${zip.zipCode}', '${zip.ListingId}');`
       )
       .then(() => {
-        // console.log("zip code Created!!@!@");
+
       })
       .catch(e => {
         console.error("Error: ");
