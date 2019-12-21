@@ -3,25 +3,24 @@ const { Pool } = require("pg");
 
 var pgClient = new Pool();
 
-module.exports.pgClient = pgClient;
 pgClient
   .connect()
   .then(() => {
     console.log("Connected To Postgres!!");
-    pgClient.query(`CREATE TABLE IF NOT EXISTS zip (
+    pgClient.query(`CREATE TABLE IF NOT EXISTS zips (
       zipcode varchar(255),
       ListingId int
     );
 
-    CREATE TABLE IF NOT EXISTS review (
+    CREATE TABLE IF NOT EXISTS reviews (
       rating INT not NULL,
       dateS date,
-      title varchar(255) not null,
-      review varchar(255) not null,
+      title TEXT not null,
+      review TEXT not null,
       dateP date,
-      author varchar(255) not null,
-      aLocation varchar(255),
-      ownerR varchar(255),
+      author TEXT not null,
+      aLocation TEXT,
+      ownerR TEXT,
       ListingId INT not Null
     );`);
   })

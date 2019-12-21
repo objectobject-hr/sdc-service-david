@@ -1,5 +1,5 @@
-const Reviews = require("./index.js").Reviews;
-const Zips = require("./index.js").Zips;
+const Reviews = require("./data").Reviews;
+const Zips = require("./data").Zips;
 const faker = require("faker");
 var moment = require("moment");
 var zipcodes = require("zipcodes");
