@@ -1,14 +1,21 @@
+// random data libraries
 const faker = require("faker");
 var moment = require("moment");
 var zipcodes = require("zipcodes");
+
+// for PostgresSql
 const pgClient = require("./index");
+
+// modules for creating csv
+const fsPromises = require("fs").promises;
+const path = require("path");
 
 genReview = async () => {
   let revObj, randOwn, randLoc, date;
   let listReviews = [];
   let ownerProb = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   let locationProb = [1, 2, 3];
-  for (let j = 0; j < 100000; j++) {
+  for (let j = 0; j < 1; j++) {
     let randRev = Math.floor(Math.random() * 25);
 
     for (let i = 0; i < randRev; i++) {
@@ -27,57 +34,85 @@ genReview = async () => {
       } else {
         revObj.dateP = stringDate;
       }
-      revObj.author = escape(faker.name.findName());
-      if (ownerProb[randOwn] === 4) {
-        revObj.ownerR = faker.lorem.paragraph();
-      }
-      if (locationProb[randLoc] === 2) {
-        revObj.aLocation = escape(
-          `${faker.address.city()}, ${faker.address.stateAbbr()}`
-        );
-      }
+      revObj.author = faker.name.findName();
+      // if (ownerProb[randOwn] === 4) {
+      revObj.ownerR = faker.lorem.paragraph();
+      // }
+      // if (locationProb[randLoc] === 2) {
+      revObj.aLocation = `${faker.address.city()}, ${faker.address.stateAbbr()}`;
+
+      // }
       revObj.ListingId = j;
       listReviews.push(revObj);
     }
   }
-  await listReviews.forEach(async (review, index) => {
-    await pgClient
-      .query(
-        `INSERT INTO reviews (rating, dateS, title, review, dateP, author, aLocation, ownerR, ListingId) VALUES ('${review.rating}', '${review.dateS}', '${review.title}', '${review.review}', '${review.dateP}', '${review.author}', '${review.aLocation}', '${review.ownerR}', '${review.ListingId}');`
-      )
-      .then(() => {
-        console.log(index);
-      })
-      .catch(e => {
-        console.error("seeding function failed: ", e);
-      });
+
+  const output = [
+    "rating",
+    "dateS",
+    "title",
+    "review",
+    "dateP",
+    "author",
+    "aLocation",
+    "ownerR",
+    "ListingId"
+  ];
+  const filename = path.join(__dirname, "output.csv");
+
+  await listReviews.forEach((review, index) => {
+    const row = [];
+    row.push(review.rating);
+    row.push(review.dateS);
+    row.push(review.title);
+    row.push(review.review);
+    row.push(review.dateP);
+    row.push(review.author);
+    row.push(review.aLocation);
+    row.push(review.ownerR);
+    row.push(review.ListingId);
+
+    output.push(row.join());
+    console.log(index);
   });
+
+  fsPromises
+    .writeFile(filename, output)
+    .then(() => {
+      console.log("Successfully written!");
+      pgClient.query(
+        `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/output.csv' DELIMITER '|' CSV`
+      );
+    })
+    .catch(err => {
+      throw err;
+    });
 };
 
-genLocations = async () => {
-  let zipCodeObj;
-  let zipArray = [];
+// genLocations = async () => {
+//   let zipCodeObj;
+//   let zipArray = [];
 
-  for (let i = 0; i < 100000; i++) {
-    zipCodeObj = {};
-    let randZip = zipcodes.random();
-    zipCodeObj.zipCode = randZip.zip;
-    zipCodeObj.ListingId = i;
-    zipArray.push(zipCodeObj);
-  }
-  await zipArray.forEach(async (zip, index) => {
-    await pgClient
-      .query(
-        `INSERT INTO zips (zipcode, ListingId) VALUES ('${zip.zipCode}', '${zip.ListingId}');`
-      )
-      .then(() => {
-        console.log(index);
-      })
-      .catch(e => {
-        console.error("Error: ");
-      });
-  });
-};
+//   for (let i = 0; i < 100000; i++) {
+//     zipCodeObj = {};
+//     let randZip = zipcodes.random();
+//     zipCodeObj.zipCode = randZip.zip;
+//     zipCodeObj.ListingId = i;
+//     zipArray.push(zipCodeObj);
+//   }
+//   await zipArray.forEach(async (zip, index) => {
+//     await pgClient
+//       .query(
+//         `INSERT INTO zips (zipcode, ListingId) VALUES ('${zip.zipCode}', '${zip.ListingId}');`
+//       )
+//       .then(() => {
+//         console.log(index);
+//       })
+//       .catch(e => {
+//         console.error("Error: ");
+//       });
+//   });
+// };
 
 genReview();
-genLocations();
+// genLocations();
