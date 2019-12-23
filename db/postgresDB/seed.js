@@ -7,7 +7,7 @@ var zipcodes = require("zipcodes");
 const pgClient = require("./index");
 
 // modules for creating csv
-const fsPromises = require("fs").promises;
+const fs = require("fs");
 const path = require("path");
 
 genReview = async () => {
@@ -15,7 +15,7 @@ genReview = async () => {
   let listReviews = [];
   let ownerProb = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   let locationProb = [1, 2, 3];
-  for (let j = 0; j < 1000000; j++) {
+  for (let j = 0; j < 1; j++) {
     let randRev = Math.floor(Math.random() * 25);
 
     for (let i = 0; i < randRev; i++) {
@@ -48,7 +48,8 @@ genReview = async () => {
   }
 
   // var output = `rating, dateS, title, review, dateP, author, aLocation, ownerR, ListingId\n`;
-  var output = "";
+  var output =
+    "rating,dateS,title,review,dateP,author,aLocation,ownerR,ListingId\n";
   const filename = path.join(__dirname, "reviews.csv");
   // var review = listReviews[0];
   await listReviews.forEach((review, index) => {
@@ -56,57 +57,58 @@ genReview = async () => {
     console.log(index);
   });
 
-  fsPromises
-    .writeFile(filename, output)
-    .then(() => {
-      pgClient
-        .query(
-          `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/reviews.csv' DELIMITER ',' CSV`
-        )
-        .then(() => {
-          console.log("Successfully written reviews!");
-          // pgClient.end();
-        });
-    })
-    .catch(err => {
-      throw err;
-    });
+  const writeReviews = fs.createWriteStream(filename);
+  writeReviews.write(output, "utf8");
+  // .then(() => {
+  //   // pgClient
+  //   //   .query(
+  //   //     `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/reviews.csv' DELIMITER ',' CSV`
+  //   //   )
+  //   //   .then(() => {
+  //   //     console.log("Successfully written reviews!");
+  //   //     // pgClient.end();
+  //   //   });
+  //   console.log("successfully created csvfile!!");
+  // })
+  // .catch(err => {
+  //   throw err;
+  // });
 };
 
-genLocations = async () => {
-  let zipCodeObj;
-  let zipArray = [];
+// genLocations = async () => {
+//   let zipCodeObj;
+//   let zipArray = [];
 
-  for (let i = 0; i < 10000000; i++) {
-    zipCodeObj = {};
-    let randZip = zipcodes.random();
-    zipCodeObj.zipCode = randZip.zip;
-    zipCodeObj.ListingId = i;
-    zipArray.push(zipCodeObj);
-  }
+//   for (let i = 0; i < 10000000; i++) {
+//     zipCodeObj = {};
+//     let randZip = zipcodes.random();
+//     zipCodeObj.zipCode = randZip.zip;
+//     zipCodeObj.ListingId = i;
+//     zipArray.push(zipCodeObj);
+//   }
 
-  var zipCodes = "";
+//   var zipCodes = "";
 
-  var filenameTwo = path.join(__dirname, "zips.csv");
-  await zipArray.forEach((zip, index) => {
-    zipCodes += `${zip.zipCode}, ${zip.ListingId}\n`;
-    console.log(index);
-  });
-  await fsPromises
-    .writeFile(filenameTwo, zipCodes)
-    .then(async () => {
-      await pgClient
-        .query(
-          `COPY zips FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/zips.csv' DELIMITER ',' CSV`
-        )
-        .then(() => {
-          console.log("Successfully written zipcodes!");
-        });
-    })
-    .catch(err => {
-      throw err;
-    });
-};
+//   var filenameTwo = path.join(__dirname, "zips.csv");
+//   await zipArray.forEach((zip, index) => {
+//     zipCodes += `${zip.zipCode}, ${zip.ListingId}\n`;
+//     console.log(index);
+//   });
+//   await fsPromises
+//     .writeFile(filenameTwo, zipCodes)
+//     .then(async () => {
+//       await pgClient
+//         .query(
+//           `COPY zips FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/zips.csv' DELIMITER ',' CSV`
+//         )
+//         .then(() => {
+//           console.log("Successfully written zipcodes!");
+//         });
+//     })
+//     .catch(err => {
+//       throw err;
+//     });
+// };
 
 genReview();
-genLocations();
+// genLocations();
