@@ -1,10 +1,7 @@
-require("dotenv").config();
 const faker = require("faker");
 var moment = require("moment");
 var zipcodes = require("zipcodes");
-const { Pool } = require("pg");
-
-var pgClient = new Pool();
+const pgClient = require("./index");
 
 genReview = async () => {
   let revObj, randOwn, randLoc, date;
@@ -68,16 +65,19 @@ genLocations = async () => {
     zipCodeObj.ListingId = i;
     zipArray.push(zipCodeObj);
   }
-  await zipArray.forEach(async zip => {
+  await zipArray.forEach(async (zip, index) => {
     await pgClient
       .query(
         `INSERT INTO zips (zipcode, ListingId) VALUES ('${zip.zipCode}', '${zip.ListingId}');`
       )
-      .then(() => {})
+      .then(() => {
+        console.log(index);
+      })
       .catch(e => {
         console.error("Error: ");
       });
   });
 };
-genLocations();
+
 genReview();
+genLocations();
