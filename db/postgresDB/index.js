@@ -13,15 +13,15 @@ pgClient
     );
 
     CREATE TABLE IF NOT EXISTS reviews (
-      rating INT not NULL,
-      dateS date,
+      rating TEXT not NULL,
+      dateS TEXT,
       title TEXT not null,
       review TEXT not null,
-      dateP date,
+      dateP TEXT,
       author TEXT not null,
       aLocation TEXT,
       ownerR TEXT,
-      ListingId INT not Null
+      ListingId TEXT not Null
     );`);
   })
   .catch(error => {
