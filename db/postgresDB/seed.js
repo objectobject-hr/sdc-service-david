@@ -65,7 +65,7 @@ genReview = async () => {
   //   //     `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/reviews.csv' DELIMITER ',' CSV`
   //   //   )
   //   //   .then(() => {
-  //   //     console.log("Successfully written reviews!");
+  //   //     console.log("Successfully written reviews!")
   //   //     // pgClient.end();
   //   //   });
   //   console.log("successfully created csvfile!!");
