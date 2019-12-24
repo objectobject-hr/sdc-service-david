@@ -1,28 +1,27 @@
 require("dotenv").config();
-const { Pool } = require("pg");
+const { Client } = require("pg");
 
-var pgClient = new Pool();
+module.exports = pgClient = new Client();
 
-module.exports.pgClient = pgClient;
 pgClient
   .connect()
   .then(() => {
     console.log("Connected To Postgres!!");
-    pgClient.query(`CREATE TABLE IF NOT EXISTS zip (
+    pgClient.query(`CREATE TABLE IF NOT EXISTS zips (
       zipcode varchar(255),
       ListingId int
     );
 
-    CREATE TABLE IF NOT EXISTS review (
-      rating INT not NULL,
-      dateS date,
-      title varchar(255) not null,
-      review varchar(255) not null,
-      dateP date,
-      author varchar(255) not null,
-      aLocation varchar(255),
-      ownerR varchar(255),
-      ListingId INT not Null
+    CREATE TABLE IF NOT EXISTS reviews (
+      rating TEXT not NULL,
+      dateS TEXT,
+      title TEXT not null,
+      review TEXT not null,
+      dateP TEXT,
+      author TEXT not null,
+      aLocation TEXT,
+      ownerR TEXT,
+      ListingId TEXT not Null
     );`);
   })
   .catch(error => {
