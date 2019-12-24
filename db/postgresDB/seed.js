@@ -10,70 +10,79 @@ const pgClient = require("./index");
 const fs = require("fs");
 const path = require("path");
 
-genReview = async () => {
-  let revObj, randOwn, randLoc, date;
-  let listReviews = [];
-  let ownerProb = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const filename = path.join(__dirname, "reviews.csv");
+var output = ``;
+
+const writeReviews = fs.createWriteStream(filename);
+writeReviews.write(output, "utf8");
+
+genReview = (writer, encoding, callback) => {
+  let randLoc, date;
   let locationProb = [1, 2, 3];
-  for (let j = 0; j < 1; j++) {
-    let randRev = Math.floor(Math.random() * 25);
+  let j = 1000000;
+  var write = () => {
+    let ok = true;
 
-    for (let i = 0; i < randRev; i++) {
-      let randNums = Math.random();
-      randOwn = Math.floor(randNums * 11);
-      randLoc = Math.floor(randNums * 4);
-      date = faker.date.between("2005-2-1", "2019-12-7");
-      stringDate = JSON.stringify(date);
-      revObj = {};
-      revObj.rating = Math.floor(randNums * 5) + 1;
-      revObj.dateS = stringDate;
-      revObj.title = faker.lorem.sentence();
-      revObj.review = faker.lorem.paragraph();
-      if (locationProb[randLoc] === 2) {
-        revObj.dateP = JSON.stringify(moment(date).add(1, "M"));
-      } else {
-        revObj.dateP = stringDate;
+    do {
+      j--;
+      let randRev = Math.floor(Math.random() * 21);
+      if (j % 10000 === 0) {
+        console.log(j);
       }
-      revObj.author = faker.name.findName();
-      // if (ownerProb[randOwn] === 4) {
-      revObj.ownerR = faker.lorem.paragraph();
-      // }
-      // if (locationProb[randLoc] === 2) {
-      revObj.aLocation = `"${faker.address.city()}, ${faker.address.stateAbbr()}"`;
+      for (let i = 0; i < randRev; i++) {
+        let randNums = Math.random();
+        randOwn = Math.floor(randNums * 11);
+        randLoc = Math.floor(randNums * 4);
+        date = faker.date.between("2005-2-1", "2019-12-7");
+        stringDate = JSON.stringify(date);
 
-      // }
-      revObj.ListingId = j;
-      listReviews.push(revObj);
+        var rating = Math.floor(randNums * 5) + 1;
+        var dateS = stringDate;
+        var title = faker.lorem.sentence();
+        var review = faker.lorem.paragraph();
+        if (locationProb[randLoc] === 2) {
+          var dateP = JSON.stringify(moment(date).add(1, "M"));
+        } else {
+          var dateP = stringDate;
+        }
+        var author = faker.name.findName();
+        var ownerR = faker.lorem.paragraph();
+        var aLocation = `"${faker.address.city()}, ${faker.address.stateAbbr()}"`;
+        var ListingId = j;
+        var data = `${rating},${dateS},${title},${review},${dateP},${author},${aLocation},${ownerR},${ListingId}\n`;
+        if (j === 0) {
+          writer.write(data, encoding, callback);
+        } else {
+          ok = writer.write(data, encoding);
+        }
+      }
+    } while (j > 0 && ok);
+    if (j > 0) {
+      writer.once("drain", write);
     }
-  }
-
-  // var output = `rating, dateS, title, review, dateP, author, aLocation, ownerR, ListingId\n`;
-  var output =
-    "rating,dateS,title,review,dateP,author,aLocation,ownerR,ListingId\n";
-  const filename = path.join(__dirname, "reviews.csv");
-  // var review = listReviews[0];
-  await listReviews.forEach((review, index) => {
-    output += `${review.rating},${review.dateS},${review.title},${review.review},${review.dateP},${review.author},${review.aLocation},${review.ownerR},${review.ListingId}\n`;
-    console.log(index);
-  });
-
-  const writeReviews = fs.createWriteStream(filename);
-  writeReviews.write(output, "utf8");
-  // .then(() => {
-  //   // pgClient
-  //   //   .query(
-  //   //     `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/reviews.csv' DELIMITER ',' CSV`
-  //   //   )
-  //   //   .then(() => {
-  //   //     console.log("Successfully written reviews!")
-  //   //     // pgClient.end();
-  //   //   });
-  //   console.log("successfully created csvfile!!");
-  // })
-  // .catch(err => {
-  //   throw err;
-  // });
+  };
+  write();
 };
+
+genReview(writeReviews, "utf-8", () => {
+  writeReviews.end(err => {
+    if (err) {
+      console.log(err);
+    } else {
+      pgClient
+        .query(
+          `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/reviews.csv' DELIMITER ',' CSV`
+        )
+        .then(() => {
+          console.log("Successfully written reviews!");
+          // pgClient.end();
+        })
+        .catch(err => {
+          throw err;
+        });
+    }
+  });
+});
 
 // genLocations = async () => {
 //   let zipCodeObj;
@@ -110,5 +119,4 @@ genReview = async () => {
 //     });
 // };
 
-genReview();
 // genLocations();
