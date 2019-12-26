@@ -2,3 +2,5 @@ node_modules/
 bundle.js
 foo.config
 .env
+reviews.csv
+zips.csv

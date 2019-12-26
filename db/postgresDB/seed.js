@@ -1,7 +1,6 @@
 // random data libraries
 const faker = require("faker");
 var moment = require("moment");
-var zipcodes = require("zipcodes");
 
 // for PostgresSql
 const pgClient = require("./index");
@@ -19,7 +18,7 @@ writeReviews.write(output, "utf8");
 genReview = (writer, encoding, callback) => {
   let randLoc, date;
   let locationProb = [1, 2, 3];
-  let j = 1000000;
+  let j = 100;
   var write = () => {
     let ok = true;
 
@@ -27,7 +26,7 @@ genReview = (writer, encoding, callback) => {
       j--;
       let randRev = Math.floor(Math.random() * 21);
       if (j % 10000 === 0) {
-        console.log(j);
+        console.log(j + " Reviews Written");
       }
       for (let i = 0; i < randRev; i++) {
         let randNums = Math.random();
@@ -41,7 +40,7 @@ genReview = (writer, encoding, callback) => {
         var title = faker.lorem.sentence();
         var review = faker.lorem.paragraph();
         if (locationProb[randLoc] === 2) {
-          var dateP = JSON.stringify(moment(date).add(1, "M"));
+          var dateP = moment(date).add(1, "M");
         } else {
           var dateP = stringDate;
         }
@@ -75,7 +74,7 @@ genReview(writeReviews, "utf-8", () => {
         )
         .then(() => {
           console.log("Successfully written reviews!");
-          // pgClient.end();
+          pgClient.end();
         })
         .catch(err => {
           throw err;
@@ -84,39 +83,53 @@ genReview(writeReviews, "utf-8", () => {
   });
 });
 
-// genLocations = async () => {
-//   let zipCodeObj;
-//   let zipArray = [];
+const zipCodeFile = path.join(__dirname, "zips.csv");
+var zipCodes = ``;
 
-//   for (let i = 0; i < 10000000; i++) {
-//     zipCodeObj = {};
-//     let randZip = zipcodes.random();
-//     zipCodeObj.zipCode = randZip.zip;
-//     zipCodeObj.ListingId = i;
-//     zipArray.push(zipCodeObj);
-//   }
+const writeZipCodes = fs.createWriteStream(zipCodeFile);
+writeZipCodes.write(zipCodes, "utf8");
 
-//   var zipCodes = "";
+genLocations = (writer, encoding, callback) => {
+  let i = 100;
 
-//   var filenameTwo = path.join(__dirname, "zips.csv");
-//   await zipArray.forEach((zip, index) => {
-//     zipCodes += `${zip.zipCode}, ${zip.ListingId}\n`;
-//     console.log(index);
-//   });
-//   await fsPromises
-//     .writeFile(filenameTwo, zipCodes)
-//     .then(async () => {
-//       await pgClient
-//         .query(
-//           `COPY zips FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/zips.csv' DELIMITER ',' CSV`
-//         )
-//         .then(() => {
-//           console.log("Successfully written zipcodes!");
-//         });
-//     })
-//     .catch(err => {
-//       throw err;
-//     });
-// };
+  var writeZip = () => {
+    let ok = true;
+    do {
+      i--;
+      if (i % 10000 === 0) {
+        console.log(i + " zipCodes Written");
+      }
+      const zipCode = faker.address.zipCode().slice(0, 5);
+      const ListingId = i;
+      const zips = `${zipCode},${ListingId}\n`;
+      if (i === 0) {
+        writer.write(zips, encoding, callback);
+      } else {
+        ok = writer.write(zips, encoding);
+      }
+    } while (i > 0 && ok);
+    if (i > 0) {
+      writer.once("drain", writeZip);
+    }
+  };
+  writeZip();
+};
 
-// genLocations();
+genLocations(writeZipCodes, "utf-8", () => {
+  writeZipCodes.end(err => {
+    if (err) {
+      console.log(err);
+    } else {
+      pgClient
+        .query(
+          `COPY zips FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/zips.csv' DELIMITER ',' CSV`
+        )
+        .then(() => {
+          console.log("Successfully written zipcodes!");
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  });
+});
