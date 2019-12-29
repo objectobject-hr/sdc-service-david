@@ -12,6 +12,8 @@ db.once("open", function() {
   console.log("Welcome to Mongoose!!");
 });
 
+exports.db = db;
+
 var Schema = mongoose.Schema;
 
 var reviewsSchema = new Schema({
@@ -26,7 +28,7 @@ var reviewsSchema = new Schema({
   ListingId: Number
 });
 
-exports.reviews = mongoose.model("Reviews", reviewsSchema);
+exports.reviews = mongoose.model("Review", reviewsSchema);
 
 var zipsSchema = new Schema({
   zipcode: String,
