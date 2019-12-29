@@ -5,16 +5,16 @@ var moment = require("moment");
 // for Mongodb
 const Zips = require("./index.js").zips;
 const Reviews = require("./index.js").reviews;
-const db = require("./index").db;
+var mongoose = require("mongoose");
 // modules for creating csv
 
 const genReview = async () => {
   let revObj, randOwn, randLoc, listReviews, date;
   let ownerProb = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   let locationProb = [1, 2, 3];
-  for (let k = 0; k < 100; k++) {
+  for (let k = 0; k < 10; k++) {
     listReviews = [];
-    for (let j = 0; j < 10000; j++) {
+    for (let j = 0; j < 100; j++) {
       let randRev = Math.floor(Math.random() * 21);
 
       for (let i = 0; i < randRev; i++) {
@@ -56,15 +56,16 @@ const genReview = async () => {
         console.error("seeding function failed: " + e);
       });
   }
+  mongoose.connection.close();
 };
 
 genReview();
 
 genLocations = async () => {
-  for (let j = 0; j < 100; j++) {
+  for (let j = 0; j < 10; j++) {
     let zipArray = [];
     let zipCodeObj;
-    for (let i = 0; i < 100000; i++) {
+    for (let i = 0; i < 100; i++) {
       zipCodeObj = {};
       zipCodeObj.zipCode = faker.address.zipCode().slice(0, 5);
       zipCodeObj.ListingId = i;
