@@ -15,32 +15,24 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-app.get("/reviews/:id", async (req, res) => {
-  try {
-    const data = await Reviews.findAll({ where: { ListingId: req.params.id } });
-
-    if (!data) {
-      res.status(404).send();
+app.get("/reviews/:id", (req, res) => {
+  reviews.findOne({ ListingId: req.params.id }, (err, data) => {
+    if (err) {
+      res.status(404).send(err);
+    } else {
+      res.status(200).send(data);
     }
-
-    res.status(200).send(data);
-  } catch (e) {
-    res.status(500).res.send(e);
-  }
+  });
 });
 
 app.get("/zips/:id", async (req, res) => {
-  try {
-    const data = await Zips.findAll({ where: { ListingId: req.params.id } });
-
-    if (!data) {
-      res.status(404).send();
+  zips.findOne({ ListingId: req.params.id }, (err, data) => {
+    if (err) {
+      res.status(404).send(err);
+    } else {
+      res.status(200).send(data);
     }
-
-    res.status(200).send(data);
-  } catch (e) {
-    res.status(500).res.send(e);
-  }
+  });
 });
 
 app.listen(port, () => {

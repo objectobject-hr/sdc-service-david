@@ -12,8 +12,6 @@ db.once("open", function() {
   console.log("Welcome to Mongoose!!");
 });
 
-exports.db = db;
-
 var Schema = mongoose.Schema;
 
 var reviewsSchema = new Schema({
