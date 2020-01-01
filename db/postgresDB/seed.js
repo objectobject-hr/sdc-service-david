@@ -18,13 +18,13 @@ writeReviews.write(output, "utf8");
 genReview = (writer, encoding, callback) => {
   let randLoc, date;
   let locationProb = [1, 2, 3];
-  let j = 100;
+  let j = 10000000;
   var write = () => {
     let ok = true;
 
     do {
       j--;
-      let randRev = Math.floor(Math.random() * 21);
+      let randRev = Math.floor(Math.random() * 5);
       if (j % 10000 === 0) {
         console.log(j + " Reviews Written");
       }
@@ -90,13 +90,13 @@ const writeZipCodes = fs.createWriteStream(zipCodeFile);
 writeZipCodes.write(zipCodes, "utf8");
 
 genLocations = (writer, encoding, callback) => {
-  let i = 100;
+  let i = 10000000;
 
   var writeZip = () => {
     let ok = true;
     do {
       i--;
-      if (i % 10000 === 0) {
+      if (i % 100000 === 0) {
         console.log(i + " zipCodes Written");
       }
       const zipCode = faker.address.zipCode().slice(0, 5);
