@@ -6,7 +6,7 @@
   "scripts": {
     "react-dev": "webpack -d --watch",
     "start": "nodemon server/index.js",
-    "seed": "node --max_old_space_size=7168 db/mongoDB/jsonSeed.js"
+    "seed": "node --max_old_space_size=7168 db/mongoDB/csvSeed.js"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,7 @@
     "moment": "^2.24.0",
     "mongodb": "^3.4.1",
     "mongoose": "^5.8.3",
+    "morgan": "^1.9.1",
     "mysql2": "^2.0.2",
     "pg": "^7.15.1",
     "pg-promise": "^10.3.1",

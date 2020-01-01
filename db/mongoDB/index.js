@@ -15,7 +15,7 @@ db.once("open", function() {
 var Schema = mongoose.Schema;
 
 var reviewsSchema = new Schema({
-  rating: String,
+  rating: Number,
   dateS: String,
   title: String,
   review: String,
@@ -23,14 +23,14 @@ var reviewsSchema = new Schema({
   author: String,
   aLocation: String,
   ownerR: String,
-  ListingId: Number
+  ListingId: { type: Number, index: true }
 });
 
 exports.reviews = mongoose.model("Review", reviewsSchema);
 
 var zipsSchema = new Schema({
   zipcode: String,
-  ListingId: Number
+  ListingId: { type: Number, index: true }
 });
 
 exports.zips = mongoose.model("Zip", zipsSchema);

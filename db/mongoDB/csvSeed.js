@@ -20,13 +20,13 @@ writeReviews.write(output, "utf8");
 genReview = (writer, encoding, callback) => {
   let randLoc, date;
   let locationProb = [1, 2, 3];
-  let j = 1000000;
+  let j = 10000000;
   var write = () => {
     let ok = true;
 
     do {
       j--;
-      let randRev = Math.floor(Math.random() * 21);
+      let randRev = Math.floor(Math.random() * 5);
       if (j % 10000 === 0) {
         console.log(j + " Reviews Written");
       }
