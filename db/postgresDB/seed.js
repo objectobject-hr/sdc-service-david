@@ -1,6 +1,7 @@
 // random data libraries
 const faker = require("faker");
 var moment = require("moment");
+var zipcodes = require("zipcodes");
 
 // for PostgresSql
 const pgClient = require("./index");
@@ -78,6 +79,16 @@ genReview(writeReviews, "utf-8", () => {
           console.log("Successfully written reviews!");
           // pgClient.end();
         })
+        .then(() => {
+          pgClient.query(
+            `create index idx_reviews_listingid on reviews(listingid);`
+          );
+          console.log("Index on listingid created!!");
+        })
+        .then(() => {
+          pgClient.query(`create index idx_reviews_id on reviews(id);`);
+          console.log("Index on id created!!");
+        })
         .catch(err => {
           throw err;
         });
@@ -92,6 +103,12 @@ const writeZipCodes = fs.createWriteStream(zipCodeFile);
 writeZipCodes.write(zipCodes, "utf8");
 
 genLocations = (writer, encoding, callback) => {
+  var randZips = [];
+
+  for (let z = 0; z < 200; z++) {
+    randZips.push(zipcodes.random().zip);
+  }
+
   let i = 10000001;
 
   var writeZip = () => {
@@ -101,7 +118,7 @@ genLocations = (writer, encoding, callback) => {
       if (i % 100000 === 0) {
         console.log(i + " zipCodes Written");
       }
-      const zipCode = faker.address.zipCode().slice(0, 5);
+      const zipCode = randZips[Math.floor(Math.random() * 201)];
       const ListingId = i;
       const zips = `${zipCode},${ListingId}\n`;
       if (i === 1) {
@@ -129,6 +146,10 @@ genLocations(writeZipCodes, "utf-8", () => {
         .then(() => {
           pgClient.query(`ALTER TABLE zips ADD id serial;`);
           console.log("Successfully written zipcodes!");
+        })
+        .then(() => {
+          pgClient.query(`create index idx_zips_listingid on zips(listingid);`);
+          console.log("Index created!!");
         })
         .catch(err => {
           console.log(err);

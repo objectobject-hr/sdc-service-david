@@ -8,7 +8,7 @@ pgClient
   .then(() => {
     console.log("Connected To Postgres!!");
     pgClient.query(`CREATE TABLE IF NOT EXISTS zips (
-      zipcode int,
+      zipcode TEXT,
       ListingId int
     );
 
@@ -34,3 +34,4 @@ pgClient
   create index idx_reviews_listingid on reviews(listingid);
   create index idx_zips_listingid on zips(listingid);
 */
+//
