@@ -3,8 +3,8 @@ import axios from "axios";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import ReviewItem from "./ReviewItem.jsx";
 import ReviewSum from "./ReviewSum.jsx";
-// import Map from './Map.jsx';
-import MapTwo from "./MapTwo.jsx";
+import Map from "./Map.jsx";
+// import MapTwo from "./MapTwo.jsx";
 
 class Reviews extends Component {
   constructor(props) {
@@ -39,7 +39,7 @@ class Reviews extends Component {
       // console.log("This is id: " + rand);
       const results = await axios.get(`http://localhost:3004/reviews/${rand}`);
       const zipResults = await axios.get(`http://localhost:3004/zips/${rand}`);
-      // console.log(results.data.rows);
+      // console.log(zipResults);
       // console.log("this is David Kim", results);
       const sortedResults = await results.data.rows.sort((a, b) => {
         return new Date(b.dateS) - new Date(a.dateS);
@@ -59,13 +59,15 @@ class Reviews extends Component {
         allowedClicks = allowedClicks - 1;
         //console.log('new allowed clicks: ' + allowedClicks)
       }
+      console.log(zipResults.data.rows[0].zipCode);
       this.setState({
         reviews: sortedResults,
         listTotal: total,
         adj: adj[Math.round(total - 1)],
         allowed: allowedClicks,
-        zip: zipResults.data.rows[0].zipCode
+        zip: zipResults.data.rows[0].zipcode
       });
+
       // console.log(results.data);
     } catch (err) {
       console.error("Could not fetch reviews: " + err);
@@ -145,6 +147,7 @@ class Reviews extends Component {
   }
 
   render() {
+    // console.log(this.state.zip);
     if (this.state.reviews.length === 0) {
       return (
         <div className="no_reviews">
@@ -242,12 +245,12 @@ class Reviews extends Component {
               </button>
             </div>
           </div>
-          {/* <div>
-          <Map zip={this.state.zip}/>
-        </div> */}
           <div>
-            <MapTwo zip={this.state.zip} />
+            <Map zip={this.state.zip} />
           </div>
+          {/* <div>
+            <MapTwo zip={this.state.zip} />
+          </div> */}
         </div>
       );
     }

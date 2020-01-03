@@ -1,6 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './components/App.jsx';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./components/App.jsx";
 
-
-ReactDOM.render(<App />, document.getElementById('mg_root'));
+ReactDOM.render(<App />, document.getElementById("mg_root"));
