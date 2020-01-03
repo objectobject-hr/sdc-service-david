@@ -36,26 +36,26 @@ class Reviews extends Component {
     try {
       let adj = ["Terrible", "Poor", "Good", "Wonderful", "Excellent"];
       let rand = Math.floor(Math.random() * 100);
-      //console.log('This is id: ' + rand)
+      // console.log("This is id: " + rand);
       const results = await axios.get(`http://localhost:3004/reviews/${rand}`);
       const zipResults = await axios.get(`http://localhost:3004/zips/${rand}`);
-      //console.log(zipResults.data[0].zipCode);
+      // console.log(results.data.rows);
       // console.log("this is David Kim", results);
-      const sortedResults = await results.data.sort((a, b) => {
+      const sortedResults = await results.data.rows.sort((a, b) => {
         return new Date(b.dateS) - new Date(a.dateS);
       });
       const total =
-        (await results.data.reduce((a, b) => a + b.rating, 0)) /
-        results.data.length;
+        (await results.data.rows.reduce((a, b) => a + b.rating, 0)) /
+        results.data.rows.length;
       //console.log(total);
-      let allowedClicks = await Math.floor(results.data.length / 6);
+      let allowedClicks = await Math.floor(results.data.rows.length / 6);
       //console.log('allowed:' + allowedClicks)
-      if (results.data.length === 6 || allowedClicks === 0) {
+      if (results.data.rows.length === 6 || allowedClicks === 0) {
         this.setState({
           addDis: true
         });
       }
-      if (results.data.length % 6 === 0) {
+      if (results.data.rows.length % 6 === 0) {
         allowedClicks = allowedClicks - 1;
         //console.log('new allowed clicks: ' + allowedClicks)
       }
@@ -64,9 +64,9 @@ class Reviews extends Component {
         listTotal: total,
         adj: adj[Math.round(total - 1)],
         allowed: allowedClicks,
-        zip: zipResults.data[0].zipCode
+        zip: zipResults.data.rows[0].zipCode
       });
-      //console.log(results.data)
+      // console.log(results.data);
     } catch (err) {
       console.error("Could not fetch reviews: " + err);
     }
