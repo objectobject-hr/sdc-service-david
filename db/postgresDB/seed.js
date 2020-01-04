@@ -1,6 +1,7 @@
 // random data libraries
 const faker = require("faker");
 var moment = require("moment");
+var zipcodes = require("zipcodes");
 
 // for PostgresSql
 const pgClient = require("./index");
@@ -18,13 +19,13 @@ writeReviews.write(output, "utf8");
 genReview = (writer, encoding, callback) => {
   let randLoc, date;
   let locationProb = [1, 2, 3];
-  let j = 100;
+  let j = 10000001;
   var write = () => {
     let ok = true;
 
     do {
       j--;
-      let randRev = Math.floor(Math.random() * 21);
+      let randRev = Math.floor(Math.random() * 3) + 1;
       if (j % 10000 === 0) {
         console.log(j + " Reviews Written");
       }
@@ -35,7 +36,7 @@ genReview = (writer, encoding, callback) => {
         date = faker.date.between("2005-2-1", "2019-12-7");
         stringDate = JSON.stringify(date);
 
-        var rating = Math.floor(randNums * 5) + 1;
+        var rating = Math.floor(randNums * 5);
         var dateS = stringDate;
         var title = faker.lorem.sentence();
         var review = faker.lorem.paragraph();
@@ -49,14 +50,15 @@ genReview = (writer, encoding, callback) => {
         var aLocation = `"${faker.address.city()}, ${faker.address.stateAbbr()}"`;
         var ListingId = j;
         var data = `${rating},${dateS},${title},${review},${dateP},${author},${aLocation},${ownerR},${ListingId}\n`;
-        if (j === 0) {
+
+        if (j === 1) {
           writer.write(data, encoding, callback);
         } else {
           ok = writer.write(data, encoding);
         }
       }
-    } while (j > 0 && ok);
-    if (j > 0) {
+    } while (j > 1 && ok);
+    if (j > 1) {
       writer.once("drain", write);
     }
   };
@@ -73,8 +75,19 @@ genReview(writeReviews, "utf-8", () => {
           `COPY reviews FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/reviews.csv' DELIMITER ',' CSV`
         )
         .then(() => {
+          pgClient.query(`ALTER TABLE reviews ADD id serial;`);
           console.log("Successfully written reviews!");
-          pgClient.end();
+          // pgClient.end();
+        })
+        .then(() => {
+          pgClient.query(
+            `create index idx_reviews_listingid on reviews(listingid);`
+          );
+          console.log("Index on listingid created!!");
+        })
+        .then(() => {
+          pgClient.query(`create index idx_reviews_id on reviews(id);`);
+          console.log("Index on id created!!");
         })
         .catch(err => {
           throw err;
@@ -90,25 +103,31 @@ const writeZipCodes = fs.createWriteStream(zipCodeFile);
 writeZipCodes.write(zipCodes, "utf8");
 
 genLocations = (writer, encoding, callback) => {
-  let i = 100;
+  var randZips = [];
+
+  for (let z = 0; z < 200; z++) {
+    randZips.push(zipcodes.random().zip);
+  }
+
+  let i = 10000001;
 
   var writeZip = () => {
     let ok = true;
     do {
       i--;
-      if (i % 10000 === 0) {
+      if (i % 100000 === 0) {
         console.log(i + " zipCodes Written");
       }
-      const zipCode = faker.address.zipCode().slice(0, 5);
+      const zipCode = randZips[Math.floor(Math.random() * 201)];
       const ListingId = i;
       const zips = `${zipCode},${ListingId}\n`;
-      if (i === 0) {
+      if (i === 1) {
         writer.write(zips, encoding, callback);
       } else {
         ok = writer.write(zips, encoding);
       }
-    } while (i > 0 && ok);
-    if (i > 0) {
+    } while (i > 1 && ok);
+    if (i > 1) {
       writer.once("drain", writeZip);
     }
   };
@@ -125,7 +144,12 @@ genLocations(writeZipCodes, "utf-8", () => {
           `COPY zips FROM '/Users/EuiHyo_Mi/Desktop/sdc-service-david/db/postgresDB/zips.csv' DELIMITER ',' CSV`
         )
         .then(() => {
+          pgClient.query(`ALTER TABLE zips ADD id serial;`);
           console.log("Successfully written zipcodes!");
+        })
+        .then(() => {
+          pgClient.query(`create index idx_zips_listingid on zips(listingid);`);
+          console.log("Index created!!");
         })
         .catch(err => {
           console.log(err);
