@@ -10,3 +10,6 @@ scenarios:
   - flow:
       - get:
           url: "/reviews/2000"
+  # - flow:
+  #     - post:
+  #         url: "/reviews"
