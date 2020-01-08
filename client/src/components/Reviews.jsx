@@ -37,8 +37,8 @@ class Reviews extends Component {
       let adj = ["Terrible", "Poor", "Good", "Wonderful", "Excellent"];
       let rand = Math.floor(Math.random() * 100);
       // console.log("This is id: " + rand);
-      const results = await axios.get(`http://localhost:3004/reviews/${rand}`);
-      const zipResults = await axios.get(`http://localhost:3004/zips/${rand}`);
+      const results = await axios.get(`/reviews/${rand}`);
+      const zipResults = await axios.get(`/zips/${rand}`);
       // console.log(zipResults);
       // console.log("this is David Kim", results);
       const sortedResults = await results.data.rows.sort((a, b) => {
